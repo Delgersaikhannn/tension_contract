@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract MyToken is ERC721, ERC721Burnable, Ownable {
+contract Tension is ERC721, ERC721Burnable, Ownable {
     using SafeMath for uint256;
 
     event TokenMinted(address indexed owner, uint256 indexed tokenId);
@@ -25,10 +25,6 @@ contract MyToken is ERC721, ERC721Burnable, Ownable {
 
     function safeMint(address to, uint256 tokenId) public payable {
         require(msg.value == mintPrice, "Incorrect Ether amount sent");
-        require(
-            ownerOf(tokenId) == address(0),
-            "Token with this ID already exists"
-        );
 
         _safeMint(to, tokenId);
         emit TokenMinted(to, tokenId);
@@ -38,9 +34,9 @@ contract MyToken is ERC721, ERC721Burnable, Ownable {
         mintPrice = newPrice;
     }
 
-    receive() external payable onlyOwner {
+    function collectEther() external onlyOwner {
         address payable ownerAddress = payable(owner());
-        ownerAddress.transfer(msg.value);
+        ownerAddress.transfer(address(this).balance);
     }
 
     function transferOwnership(address newOwner) public override onlyOwner {
